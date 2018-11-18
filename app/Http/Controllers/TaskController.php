@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Task;
 use App\Http\Requests;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Repositories\TaskRepository;
 
 class TaskController extends Controller
 {
-    public function __construct()
+    protected $tasks;
+    public function __construct(TaskRepository $tasks)
     {
         $this->middleware('auth');
-    }
 
+        $this->tasks = $tasks;
+    }
     /**
      * 顯示使用者所有任務的清單。
      *
@@ -21,8 +25,13 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
-        return view('tasks.index');
+        $tasks = Task::where('user_id', $request->user()->id)->get();
+
+        return view('tasks.index', [
+            'tasks' => $tasks,
+        ]);
     }
+
     /**
      * 建立新的任務。
      *
